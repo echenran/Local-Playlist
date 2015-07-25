@@ -1,10 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <title>Local-Playlist</title>
+    <title>Playlist share</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+      li.song-list {
+        cursor: pointer;
+      }
+    </style>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
   </head>
   <body>
-    Hello world!
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" />
+      <button>Send</button>
+    </form>
+    <div id="dialog" title="Basic dialog">
+      <ul>
+
+      </ul>
+    </div>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script>
+      var socket = io();
+
+      function createDialog(data){
+        $("#dialog" ).dialog();
+        $.each(data.tracks.items,function(index, val){
+            $('#dialog > ul').append($('<li class="song-list" id="' + val.id +'"link=' + val.external_urls.spotify + '>' + val.name + '</li>') );
+        });
+        $('li.song-list').click(function() {
+          var res = jQuery(this).text();
+          var link = jQuery(this).attr('link');
+          var id = jQuery(this).attr('id');
+           var data = {
+             "name": res,
+             "link": link,
+             "id": id,
+           }
+           socket.emit('add song', data);
+           $('#dialog > ul').empty()
+           $('#dialog').dialog('destroy');
+        });
+      }
+
+      $('form').submit(function(){
+        var searchTerm = $('#m').val();
+        $.ajax({
+           url: 'https://api.spotify.com/v1/search?q=' + searchTerm + '&type=track&market=US',
+           data: {
+              format: 'json'
+           },
+           error: function() {
+              $('#info').html('<p>An error has occurred</p>');
+           },
+           dataType: 'json',
+           success: function(data) {
+             createDialog(data);
+           },
+           type: 'GET'
+        });
+        $('#m').val('');
+        return false;
+      });
+
+      socket.on('add song', function(msg){
+        console.log(msg);
+        $('#messages').append($('<li><a href="' + msg.link + '" target="_blank">'+ msg.name + '</a></li>'));
+      });
+    </script>
   </body>
 </html>

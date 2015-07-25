@@ -1,9 +1,17 @@
-var express = require('express');
-var app = express();
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
-app.get('/', function(req, res) {
-  res.type('text/plain'); // set content-type
-  res.send('i am a beautiful butterfly'); // send text response
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/index.html');
 });
 
-app.listen(8080);
+io.on('connection', function(socket){
+  socket.on('add song', function(msg){
+    io.emit('add song', msg);
+  });
+});
+
+http.listen(3000, function(){
+  console.log('listening on *:3000');
+});
