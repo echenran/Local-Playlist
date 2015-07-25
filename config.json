@@ -1,0 +1,4 @@
+{
+    "ApiRootUrl": "https://api.spotify.com/v1/",
+    "TrackUrl": "tracks/"
+}

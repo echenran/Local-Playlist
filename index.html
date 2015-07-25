@@ -16,6 +16,7 @@
       }
     </style>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
   </head>
   <body>
     <ul id="messages"></ul>
@@ -28,12 +29,17 @@
 
       </ul>
     </div>
+    <video style="width:250px;height:0px;" class="videoParent" controls="" autoplay="" name="media">
+  		<source class="videoChild" src=""
+  		type="audio/mpeg">
+  	</video>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script type="text/javascript" src="playPreview.js"></script>
     <script>
       var socket = io();
-
+      // console.log(play());
       function createDialog(data){
         $("#dialog" ).dialog();
         $.each(data.tracks.items,function(index, val){
@@ -76,7 +82,7 @@
 
       socket.on('add song', function(msg){
         console.log(msg);
-        $('#messages').append($('<li><a href="' + msg.link + '" target="_blank">'+ msg.name + '</a></li>'));
+        $('#messages').append($('<li onclick="playPreview(&quot;' + msg.id + '&quot;)"><a href="' + msg.link + '" target="_blank">'+ msg.name + '</a></li>'));
       });
     </script>
   </body>
