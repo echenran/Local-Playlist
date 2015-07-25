@@ -1,10 +1,59 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Local-Playlist</title>
-  </head>
-  <body>
-    Hello World!
-  </body>
+<head>
+</head>
+<body>
+	<style>
+	* { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 20px Georgia, Arial; }
+      h1 {font: 30px Helvetica, Arial ;}
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #unapproved, #approved { list-style-type: none; margin: 0; padding: 0; }
+      #unapproved li, #approved li { padding: 5px 10px; }
+      #unapproved li:nth-child(odd), #approved li:nth-child(odd) { background: #eee; }
+  	</style>
+
+  	<ul id="unapproved">
+  		<h1>TO APPROVE</h1>
+  	</ul>
+  	<br><br>
+  	<ul id="approved">
+  		<h1>APPROVED</h1>
+  	</ul>
+    <form action="">
+      <input id="song" placeholder="Song Title/URL" autocomplete="off" /><button>Submit</button>
+    </form>
+
+	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+	<script>
+	var socket = io();
+
+	$('form').submit(function(){
+	    socket.emit('new song', $('#song').val());
+	    $('#song').val('');
+	    return false;
+    });
+
+	socket.on('add request', function(songnum, song){
+        //$('#songs').append($('<li>').text(msg));
+        $('#unapproved').append("<li id='"+songnum+"'><input id='s"+songnum+"' type='checkbox' name='vehicle' onclick='checkchange("+songnum+")'> "+song+"</li>");
+    });
+
+	var checkchange=function(songnum){
+		if($("#s"+songnum).is(':checked'))
+			socket.emit('user approves', songnum);
+		else	socket.emit('user disapproves', songnum);
+	}
+
+	socket.on('song approved', function(songnum, song){
+		var song = $("#"+songnum).text();
+		console.log("Song "+songnum+" approved");
+		$("#approved").append("<li id='-"+songnum+"'>"+song+"</li>");
+		$("#"+songnum).remove();
+	})
+	</script>
+</body>
 </html>
