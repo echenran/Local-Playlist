@@ -1,22 +1,58 @@
+<!DOCTYPE html>
 <html>
 <head>
-	<!--<script src="server.js"></script>-->
 </head>
 <body>
-	<div class="bar" onclick="barclick()" style="background-color:red; width:100%; height:100px"></div>
-	<div class="bar" onclick="barclick()" style="background-color:blue; width:100%; height:100px"></div>
-	<div class="bar" onclick="barclick()" style="background-color:green; width:100%; height:100px"></div>
-	<div class="bar" onclick="barclick()" style="background-color:yellow; width:100%; height:100px"></div>
-	<div class="bar" onclick="barclick()" style="background-color:orange; width:100%; height:100px"></div>
+	<style>
+	* { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #unapproved, #approved { list-style-type: none; margin: 0; padding: 0; }
+      #unapproved li, #approved li { padding: 5px 10px; }
+      #unapproved li:nth-child(odd), #approved li:nth-child(odd) { background: #eee; }
+  	</style>
+
+  	<ul id="unapproved">
+  		<h1>TO APPROVE</h1>
+  	</ul>
+  	<br><br>
+  	<ul id="approved">
+  		<h1>APPROVED</h1>
+  	</ul>
+    <form action="">
+      <input id="song" placeholder="Song Title/URL" autocomplete="off" /><button>Submit</button>
+    </form>
+
+	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 	<script>
-	function barclick() {
-	    var x = document.getElementsByClassName("bar");
-		var i;
-		for (i = 0; i < x.length; i++) {
-		    x[i].style.backgroundColor = "black";
-		}
-		document.getElementsByClassName("bar").backgroundColor="black";
+	var socket = io();
+
+	$('form').submit(function(){
+	    socket.emit('new song', $('#song').val());
+	    $('#song').val('');
+	    return false;
+    });
+
+	socket.on('add request', function(songnum, song){
+        //$('#songs').append($('<li>').text(msg));
+        $('#unapproved').append("<li id='"+songnum+"'><input id='s"+songnum+"' type='checkbox' name='vehicle' onclick='checkchange("+songnum+")'> "+song+"</li>");
+    });
+
+	var checkchange=function(songnum){
+		if($("#s"+songnum).is(':checked'))
+			socket.emit('user approves', songnum);
+		else	socket.emit('user disapproves', songnum);
 	}
+
+	socket.on('song approved', function(songnum, song){
+		var song = $("#"+songnum).text();
+		console.log("Song "+songnum+" approved");
+		$("#approved").append("<li id='-"+songnum+"'>"+song+"</li>");
+		$("#"+songnum).remove();
+	})
 	</script>
 </body>
 </html>
