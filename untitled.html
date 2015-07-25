@@ -1,12 +1,22 @@
 <html>
 <head>
-	<script src="server.js"></script>
+	<!--<script src="server.js"></script>-->
 </head>
 <body>
-	<div style="background-color:red; width:100%; height:100px"></div>
-	<div style="background-color:blue; width:100%; height:100px"></div>
-	<div style="background-color:green; width:100%; height:100px"></div>
-	<div style="background-color:yellow; width:100%; height:100px"></div>
-	<div style="background-color:orange; width:100%; height:100px"></div>
+	<div class="bar" onclick="barclick()" style="background-color:red; width:100%; height:100px"></div>
+	<div class="bar" onclick="barclick()" style="background-color:blue; width:100%; height:100px"></div>
+	<div class="bar" onclick="barclick()" style="background-color:green; width:100%; height:100px"></div>
+	<div class="bar" onclick="barclick()" style="background-color:yellow; width:100%; height:100px"></div>
+	<div class="bar" onclick="barclick()" style="background-color:orange; width:100%; height:100px"></div>
+	<script>
+	function barclick() {
+	    var x = document.getElementsByClassName("bar");
+		var i;
+		for (i = 0; i < x.length; i++) {
+		    x[i].style.backgroundColor = "black";
+		}
+		document.getElementsByClassName("bar").backgroundColor="black";
+	}
+	</script>
 </body>
 </html>
