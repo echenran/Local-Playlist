@@ -1,0 +1,19 @@
+{
+  "name": "Local-Playlist",
+  "version": "0.0.1",
+  "description": "Share playlist",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/echenran/Local-Playlist.git"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "connect": "^3.4.0",
+    "http-server": "^0.8.0",
+    "serve-static": "^1.10.0"
+  }
+}
