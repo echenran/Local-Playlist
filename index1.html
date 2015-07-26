@@ -9,36 +9,74 @@
       form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
       #unapproved, #approved { list-style-type: none; margin: 0; padding: 0; }
-      #unapproved li, #approved li { padding: 5px 10px; }
-      #unapproved li:nth-child(odd), #approved li:nth-child(odd) { background: #eee; }
+      #unapproved li, #approved a li { padding: 5px 10px; }
+      #unapproved li:nth-child(odd), #approved a li:nth-child(odd) { background-color: #eee }
+      li:hover{
+        background-color: #e6f1f6;
+      }
+      h1{
+        padding: 10px;
+      }
+      a {
+        text-decoration: none;
+        color: black;
+      }
   	</style>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 
-  	<ul id="unapproved">
-  		<h1>TO APPROVE</h1>
+  	<h1>TO APPROVE</h1>
+    <ul id="unapproved">
+  		
   	</ul>
   	<br><br>
+    <h1>APPROVED</h1>
   	<ul id="approved">
-  		<h1>APPROVED</h1>
+  		
   	</ul>
     <form action="">
       <input id="song" placeholder="Song Title/URL" autocomplete="off" /><button>Submit</button>
     </form>
 
-	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <div id="dialog" title="Results">
+      <ul>
+      </ul>
+    </div>
+    <video style="width:400px;height:0px;bottom:35px;position:fixed" class="videoParent" controls="" autoplay="" name="media">
+      <source class="videoChild" src=""
+      type="audio/mpeg">
+    </video>
+
   <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script type="text/javascript" src="playPreview.js"></script>
 	<script>
 	var socket = io();
 
 	$('form').submit(function(){
-	    socket.emit('new song', $('#song').val());
-	    $('#song').val('');
+	    var searchTerm = $('#song').val();
+      // socket.emit('new song', searchTerm);
+      $.ajax({
+       url: 'https://api.spotify.com/v1/search?q=' + searchTerm + '&type=track&market=US',
+       data: {
+          format: 'json'
+       },
+       error: function() {
+          $('#info').html('<p>An error has occurred</p>');
+       },
+       dataType: 'json',
+       success: function(data) {
+         createDialog(data);
+       },
+       type: 'GET'
+      });
+      $('#song').val('');
 	    return false;
     });
 
-	socket.on('add request', function(songnum, song){
-        //$('#songs').append($('<li>').text(msg));
-        $('#unapproved').append("<li id='"+songnum+"'><input id='s"+songnum+"' type='checkbox' name='vehicle' onclick='checkchange("+songnum+")'> "+song+"</li>");
-    });
+	socket.on('add request', function(songnum, data_obj){
+    $('#unapproved').append('<li onclick="playPreview(&quot;' + data_obj.id + '&quot;)" id="'+songnum+'"><input id="s'+songnum+'" type="checkbox" name="vehicle" onclick="checkchange('+songnum+')"><a href="'+data_obj.link+'" target="_blank"> '+data_obj.name+'</a></li>');
+  });
 
 	var checkchange=function(songnum){
 		if($("#s"+songnum).is(':checked'))
@@ -46,11 +84,32 @@
 		else	socket.emit('user disapproves', songnum);
 	}
 
-	socket.on('song approved', function(songnum, song){
+	socket.on('song approved', function(songnum, song, songlink){
 		var song = $("#"+songnum).text();
 		console.log("Song "+songnum+" approved");
-		$("#approved").append("<li id='-"+songnum+"'>"+song+"</li>");
-		$("#"+songnum).remove();
+    $('#approved').prepend($("<a href='"+songlink+"' target='_blank'><li id='-"+songnum+"'>"+song+"</li></a>").fadeIn('slow'));
+		$("#"+songnum).fadeOut(500, function() { $(this).remove(); });
 	})
+
+  function createDialog(data){
+    $("#dialog" ).dialog();
+    $.each(data.tracks.items,function(index, val){
+        $('#dialog > ul').append($('<li class="song-list" id="' + val.id +'"link=' + val.external_urls.spotify + '>' + val.name + '</li>') );
+    });
+    $('li.song-list').click(function() {
+      var res = jQuery(this).text();
+      var link = jQuery(this).attr('link');
+      var id = jQuery(this).attr('id');
+      var data = {
+         "name": res,
+         "link": link,
+         "id": id,
+       }
+       socket.emit('new song', data);
+       $('#dialog > ul').empty()
+       $('#dialog').dialog('destroy');
+    });
+  }
+
 	</script>
 </body>
