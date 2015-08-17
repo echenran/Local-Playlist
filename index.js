@@ -9,7 +9,7 @@ var path = require('path');
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index1.html');
+  res.sendFile(__dirname + '/index.html');
 });
 
 var users = 0;
