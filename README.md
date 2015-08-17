@@ -1,3 +1,4 @@
+
 # Local Playlist
 A means for you and your friends on the same wifi network to share and update a temporary playlist.
 
@@ -26,3 +27,7 @@ Local Playlist is based on the idea that every single one of you and your little
 Don't bank on this being updated, but feel free to suggest updates and whatever to emchenran@gmail.com.
 
 
+=======
+# Instruments-Hackathon
+A spotify playlist which can be shared and the songs can be searched from Spotify. It has an approval system, in which all the users has to approve the song to add that on the approved playlist.
+>>>>>>> d49186107e19d361b5068d6fcbcdeadc74a02ecd
