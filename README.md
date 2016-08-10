@@ -20,14 +20,3 @@ to set up a server. Open index.html in a browser and you're good to go.
 ### How It Works
 
 Local Playlist is based on the idea that every single one of you and your little friends need to approve a song before it can be added to the communal playlist. You search for a song in the search bar, select the one you want, approve it, and wait for everyone else to approve. Once that happens, it will be added to the list of songs that will be played.
-
-
-### Other Notes
-
-Don't bank on this being updated, but feel free to suggest updates and whatever to emchenran@gmail.com.
-
-
-
-
-
-
